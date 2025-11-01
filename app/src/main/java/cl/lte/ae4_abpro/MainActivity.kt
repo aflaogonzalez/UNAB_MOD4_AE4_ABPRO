@@ -1,68 +1,59 @@
 package cl.lte.ae4_abpro
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
+
+    // 1. Crear instancias de nuestros fragmentos para reutilizarlas
+    private val productsFragment = ProductsFragment()
+    private val profileFragment = ProfileFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Configurar la Toolbar
+        // 2. Configurar la Toolbar (esto no cambia)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // 2. Crear datos de ejemplo para la lista de productos
-        val productList = listOf(
-            Product("Leche Entera", "$1.200"),
-            Product("Pan de Molde", "$2.100"),
-            Product("Huevos (docena)", "$3.500"),
-            Product("Queso Gauda", "$4.800"),
-            Product("Jamón de Pavo", "$3.200"),
-            Product("Manzanas (kilo)", "$1.500"),
-            Product("Yogurt Natural", "$850"),
-            Product("Cereal de Maíz", "$3.990")
-        )
+        // 3. Cargar el fragmento inicial (la lista de productos) solo la primera vez
+        if (savedInstanceState == null) {
+            replaceFragment(productsFragment)
+        }
 
-        // 3. Obtener la referencia al RecyclerView del layout
-        val recyclerView: RecyclerView = findViewById(R.id.recycler_view_products)
-
-        // 4. Configurar el LayoutManager
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        // 5. Crear una instancia de nuestro ProductAdapter
-        val adapter = ProductAdapter(productList)
-
-        // 6. Asignar el adaptador al RecyclerView
-        recyclerView.adapter = adapter
-
-        // 7. Obtener la referencia a la BottomNavigationView
+        // 4. Configurar el listener de la BottomNavigationView para cambiar de fragmento
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
-
-        // 8. Configurar un listener para manejar los clics en los items de la navegación
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                // Si se presiona el item "Productos"
+                // Si se presiona "Productos", mostrar el ProductsFragment
                 R.id.nav_products -> {
-                    // Simulación de interacción: Mostrar un mensaje
-                    Toast.makeText(this, "Mostrando Productos", Toast.LENGTH_SHORT).show()
-                    // Devolver true para indicar que el evento ha sido manejado
-                    true
+                    replaceFragment(productsFragment)
+                    true // Indicar que el evento fue manejado
                 }
-                // Si se presiona el item "Perfil"
+                // Si se presiona "Perfil", mostrar el ProfileFragment
                 R.id.nav_profile -> {
-                    // Simulación de interacción: Mostrar un mensaje
-                    Toast.makeText(this, "Abriendo Perfil", Toast.LENGTH_SHORT).show()
-                    true
+                    replaceFragment(profileFragment)
+                    true // Indicar que el evento fue manejado
                 }
-                // Si no es ninguno de los anteriores
                 else -> false
             }
         }
+    }
+
+    /**
+     * Función de ayuda para reemplazar el fragmento actual en el contenedor.
+     * @param fragment El nuevo fragmento a mostrar.
+     */
+    private fun replaceFragment(fragment: Fragment) {
+        // Iniciar una transacción para modificar los fragmentos
+        supportFragmentManager.beginTransaction()
+            // Reemplazar el contenido del FrameLayout 'fragment_container' por el nuevo fragmento
+            .replace(R.id.fragment_container, fragment)
+            // Aplicar los cambios
+            .commit()
     }
 }
