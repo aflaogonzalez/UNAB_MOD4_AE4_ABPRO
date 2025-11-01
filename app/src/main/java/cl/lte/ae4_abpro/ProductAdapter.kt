@@ -1,13 +1,13 @@
 package cl.lte.ae4_abpro
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import cl.lte.ae4_abpro.databinding.ItemProductBinding
 
 /**
- * Adaptador para el RecyclerView que muestra la lista de productos.
+ * Adaptador para el RecyclerView que muestra la lista de productos,
+ * mejorado con View Binding.
  *
  * @param productList La lista de productos a mostrar.
  */
@@ -15,42 +15,38 @@ class ProductAdapter(private val productList: List<Product>) :
     RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     /**
-     * ViewHolder que contiene las vistas para un solo item de producto.
-     * Es como un "contenedor" para los elementos de la interfaz de cada fila.
+     * ViewHolder que contiene una instancia de ItemProductBinding.
+     * Esta clase de binding nos da acceso directo y seguro a todas las vistas del layout.
      */
-    class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameTextView: TextView = itemView.findViewById(R.id.text_view_product_name)
-        val priceTextView: TextView = itemView.findViewById(R.id.text_view_product_price)
-    }
+    inner class ProductViewHolder(val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root)
 
     /**
      * Se llama cuando RecyclerView necesita un nuevo ViewHolder.
-     * Aquí inflamos (creamos) el layout para un item.
+     * Aquí inflamos el layout usando la clase de binding generada.
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
-        // 1. Inflar (crear) la vista para un item de producto usando nuestro layout item_product.xml
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_product, parent, false)
-        // 2. Crear y devolver un nuevo ViewHolder con la vista del item.
-        return ProductViewHolder(itemView)
+        // 1. Inflar el layout y crear el objeto de binding. Es más limpio y seguro.
+        val binding = ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        // 2. Crear y devolver un ViewHolder con el objeto de binding.
+        return ProductViewHolder(binding)
     }
 
     /**
      * Se llama para mostrar los datos en una posición específica.
-     * Aquí vinculamos los datos del producto con las vistas del ViewHolder.
+     * Aquí vinculamos los datos directamente a través del objeto binding del holder.
      */
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        // 1. Obtener el producto actual de nuestra lista según la posición.
+        // 1. Obtener el producto actual de la lista.
         val currentProduct = productList[position]
 
-        // 2. Asignar los datos del producto a los TextViews del ViewHolder.
-        holder.nameTextView.text = currentProduct.name
-        holder.priceTextView.text = currentProduct.price
+        // 2. Asignar los datos del producto a las vistas a través del binding.
+        //    No más findViewById, ahora es holder.binding.idDeLaVista.
+        holder.binding.textViewProductName.text = currentProduct.name
+        holder.binding.textViewProductPrice.text = currentProduct.price
     }
 
     /**
      * Devuelve el número total de items en la lista.
-     * RecyclerView necesita saber cuántos elementos hay para poder dibujarlos.
      */
     override fun getItemCount() = productList.size
 }

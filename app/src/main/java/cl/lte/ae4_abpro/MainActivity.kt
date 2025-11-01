@@ -8,52 +8,65 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    // 1. Crear instancias de nuestros fragmentos para reutilizarlas
     private val productsFragment = ProductsFragment()
     private val profileFragment = ProfileFragment()
+
+    // Mejora: Guardar una referencia al fragmento que está activo actualmente.
+    // Lo inicializamos con el fragmento de productos, que es el primero que se muestra.
+    private var activeFragment: Fragment = productsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 2. Configurar la Toolbar (esto no cambia)
+        // 1. Configurar la Toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // 3. Cargar el fragmento inicial (la lista de productos) solo la primera vez
-        if (savedInstanceState == null) {
-            replaceFragment(productsFragment)
-        }
-
-        // 4. Configurar el listener de la BottomNavigationView para cambiar de fragmento
+        // 2. Configurar el listener de la BottomNavigationView
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                // Si se presiona "Productos", mostrar el ProductsFragment
                 R.id.nav_products -> {
-                    replaceFragment(productsFragment)
+                    // Mejora: Solo cambiar de fragmento si no es el que ya está activo.
+                    if (activeFragment != productsFragment) {
+                        replaceFragment(productsFragment, "Productos")
+                    }
                     true // Indicar que el evento fue manejado
                 }
-                // Si se presiona "Perfil", mostrar el ProfileFragment
                 R.id.nav_profile -> {
-                    replaceFragment(profileFragment)
+                    // Mejora: Solo cambiar de fragmento si no es el que ya está activo.
+                    if (activeFragment != profileFragment) {
+                        replaceFragment(profileFragment, "Perfil")
+                    }
                     true // Indicar que el evento fue manejado
                 }
                 else -> false
             }
         }
+
+        // 3. Cargar el fragmento inicial solo si la app se inicia por primera vez.
+        //    (savedInstanceState es nulo al inicio).
+        if (savedInstanceState == null) {
+            replaceFragment(productsFragment, "Productos")
+        }
     }
 
     /**
-     * Función de ayuda para reemplazar el fragmento actual en el contenedor.
+     * Función de ayuda mejorada para reemplazar el fragmento actual y actualizar el título.
      * @param fragment El nuevo fragmento a mostrar.
+     * @param title    El título que se mostrará en la ActionBar.
      */
-    private fun replaceFragment(fragment: Fragment) {
-        // Iniciar una transacción para modificar los fragmentos
+    private fun replaceFragment(fragment: Fragment, title: String) {
+        // Actualizar la referencia al fragmento activo.
+        activeFragment = fragment
+
+        // Iniciar la transacción para reemplazar el fragmento.
         supportFragmentManager.beginTransaction()
-            // Reemplazar el contenido del FrameLayout 'fragment_container' por el nuevo fragmento
             .replace(R.id.fragment_container, fragment)
-            // Aplicar los cambios
             .commit()
+
+        // Mejora: Actualizar el título en la ActionBar.
+        supportActionBar?.title = title
     }
 }

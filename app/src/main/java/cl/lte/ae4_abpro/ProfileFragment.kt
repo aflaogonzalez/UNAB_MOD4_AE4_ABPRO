@@ -6,9 +6,9 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
 /**
@@ -29,7 +29,7 @@ class ProfileFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         // Obtener referencias a las vistas
-        val saveButton: Button = view.findViewById(R.id.button_save)
+        val saveButton: MaterialButton = view.findViewById(R.id.button_save)
         val progressIndicator: CircularProgressIndicator = view.findViewById(R.id.progress_indicator)
 
         // Configurar el listener para el botón de guardar
